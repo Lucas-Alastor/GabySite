@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="images/icon.png" type="image/png">
+
+    <title>UGCS By Gaby</title>
+</head>
+
+<body>
+    <div class="rain-layer" id="rainLayer" aria-hidden="true"></div>
+
+    <main class="page">
+        <header class="navbar">
+            <a href="#home" class="brand" data-section-link="home" aria-label="Ir para Home">
+                <span class="brand-icon">♡</span>
+                <span>Kawaii Assets</span>
+            </a>
+
+            <nav class="nav-links" aria-label="Navegação principal">
+                <a class="nav-link active" href="#home" data-section-link="home">Home</a>
+                <a class="nav-link" href="#hairs" data-section-link="hairs">Hairs</a>
+                <a class="nav-link" href="#plushies" data-section-link="plushies">Plushies</a>
+                <a class="nav-link" href="#accessories" data-section-link="accessories">Accessories</a>
+                <a class="nav-link" href="#others" data-section-link="others">Others</a>
+            </nav>
+
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="Alternar tema">☾</button>
+        </header>
+
+        <section class="section-shell active" id="home" data-section="home">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <span class="eyebrow">✿ Roblox • Blender • Kawaii Assets</span>
+                    <h1>Game-ready assets crafted to enhance your experiences <span class="gradient-text">with creativity</span></h1>
+                    <p class="hero-description">
+                        Portfolio focused on creating Roblox assets using Blender, including hair, plushies, accessories, and custom items with a clean and polished style.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="https://discordapp.com/users/779361077308817429" target="_blank" rel="noreferrer">
+                            ♡ dm me
+                        </a>
+                        <a class="btn btn-soft" href="#hairs" data-section-link="hairs">View Assets</a>
+                    </div>
+                </div>
+
+                <aside class="profile-card" aria-label="Card de perfil">
+                    <div class="profile-image-wrap">
+                        <img src="images/profile.png"
+                            alt="Foto de perfil" />
+                        <!--<div class="profile-placeholder">
+                            Troque essa imagem pela sua foto em:<br />
+                            <small>&lt;img src="sua-foto.png"&gt;</small>
+                        </div>-->
+                    </div>
+
+                    <div class="profile-footer">
+                        <div>
+                            <strong>♡ Gaby </strong>
+                            <span>3D Roblox Asset Creator</span>
+                        </div>
+                        <a class="btn btn-primary" href="https://discordapp.com/users/779361077308817429" target="_blank" rel="noreferrer">♡ dm me</a>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="section-shell" id="hairs" data-section="hairs">
+            <div class="portfolio-panel">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="eyebrow">♡ Hair Collection</span>
+                        <h2>Hair</h2>
+                        <p>Stylish hair models designed to enhance and highlight Roblox characters.</p>
+                    </div>
+                    <span class="asset-count">6 cards</span>
+                </div>
+                <div class="cards-grid" data-grid="hairs"></div>
+            </div>
+        </section>
+
+        <section class="section-shell" id="plushies" data-section="plushies">
+            <div class="portfolio-panel">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="eyebrow">✿ Cute Friends</span>
+                        <h2>Plushies</h2>
+                        <p>Collectible plushies with delicate forms, perfect for scenarios, stores, and avatars.</p>
+                    </div>
+                    <span class="asset-count">6 cards</span>
+                </div>
+                <div class="cards-grid" data-grid="plushies"></div>
+            </div>
+        </section>
+
+        <section class="section-shell" id="accessories" data-section="accessories">
+            <div class="portfolio-panel">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="eyebrow">✦ Details</span>
+                        <h2>Accessories</h2>
+                        <p>Kawaii-style accessories designed to complement characters, outfits, and experiences.</p>
+                    </div>
+                    <span class="asset-count">6 cards</span>
+                </div>
+                <div class="cards-grid" data-grid="accessories"></div>
+            </div>
+        </section>
+
+        <section class="section-shell" id="others" data-section="others">
+            <div class="portfolio-panel">
+                <div class="section-header">
+                    <div class="section-title">
+                        <span class="eyebrow">☁ Extra</span>
+                        <h2>Others</h2>
+                        <p>Varied items, decorative props, and special assets to make any experience more vibrant.</p>
+                    </div>
+                    <span class="asset-count">6 cards</span>
+                </div>
+                <div class="cards-grid" data-grid="others"></div>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
