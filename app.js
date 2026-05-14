@@ -231,6 +231,19 @@ function updateCarouselImage(carousel, newIndex) {
   });
 }
 
+const carouselImageCache = new Map();
+
+function preloadCarouselImages(images = []) {
+  images.forEach((src) => {
+    if (!src || carouselImageCache.has(src)) return;
+
+    const preloadedImage = new Image();
+    preloadedImage.decoding = 'async';
+    preloadedImage.src = src;
+    carouselImageCache.set(src, preloadedImage);
+  });
+}
+
 function setupAssetCarousels(root = document) {
   root.querySelectorAll('.asset-carousel').forEach((carousel) => {
     const image = carousel.querySelector('img');
@@ -239,6 +252,8 @@ function setupAssetCarousels(root = document) {
     if (images.length <= 1 || carousel.dataset.carouselReady === 'true') return;
 
     carousel.dataset.carouselReady = 'true';
+    
+    preloadCarouselImages(images);
 
     const prevButton = carousel.querySelector('.carousel-btn-prev');
     const nextButton = carousel.querySelector('.carousel-btn-next');

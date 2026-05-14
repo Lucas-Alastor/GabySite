@@ -517,7 +517,6 @@ h1 {
     font-weight: 900;
     line-height: 1;
     display: grid;
-    place-items: center;
     cursor: pointer;
     transform: translateY(-50%);
     box-shadow: 0 8px 20px rgba(255, 126, 182, 0.22);
