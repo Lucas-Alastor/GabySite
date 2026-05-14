@@ -1,8 +1,26 @@
 import { db, isFirebaseConfigured } from "./firebase-config.js";
 import {
   collection,
+  doc,
+  getDoc,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const fallbackHomeContent = {
+  brandName: 'Kawaii Assets',
+  heroEyebrow: '✿ Roblox • Blender • Kawaii Assets',
+  heroTitle: 'Game-ready assets crafted to enhance your experiences',
+  heroHighlight: 'with creativity',
+  heroDescription: 'Portfolio focused on creating Roblox assets using Blender, including hair, plushies, accessories, and custom items with a clean and polished style.',
+  primaryButtonText: '♡ dm me',
+  primaryButtonUrl: 'https://discordapp.com/users/779361077308817429',
+  secondaryButtonText: 'View Assets',
+  profileName: '♡ Gaby',
+  profileRole: '3D Roblox Asset Creator',
+  profileButtonText: '♡ dm me',
+  profileButtonUrl: 'https://discordapp.com/users/779361077308817429',
+  profileImageUrl: 'images/profile.png'
+};
 
 const fallbackAssetData = {
   hairs: [
@@ -50,6 +68,7 @@ const links = document.querySelectorAll('[data-section-link]');
 const sections = document.querySelectorAll('[data-section]');
 const themeToggle = document.getElementById('themeToggle');
 const rainLayer = document.getElementById('rainLayer');
+const carouselImageCache = new Map();
 
 function createEmptyAssetData() {
   return {
@@ -67,6 +86,78 @@ function escapeHTML(value = '') {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
+}
+
+function safeText(value, fallback = '') {
+  const text = String(value || '').trim();
+  return text || fallback;
+}
+
+function safeUrl(value, fallback = '#') {
+  const url = String(value || '').trim();
+
+  if (!url) return fallback;
+
+  try {
+    const parsedUrl = new URL(url, window.location.href);
+    const allowedProtocols = ['http:', 'https:', 'mailto:'];
+    return allowedProtocols.includes(parsedUrl.protocol) ? parsedUrl.href : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function setText(selector, value) {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = value;
+}
+
+function setLink(selector, text, url) {
+  const element = document.querySelector(selector);
+  if (!element) return;
+  element.textContent = text;
+  element.href = url;
+}
+
+function applyHomeContent(content = {}) {
+  const home = { ...fallbackHomeContent, ...content };
+
+  setText('[data-home="brandName"]', safeText(home.brandName, fallbackHomeContent.brandName));
+  setText('[data-home="heroEyebrow"]', safeText(home.heroEyebrow, fallbackHomeContent.heroEyebrow));
+  setText('[data-home="heroTitle"]', safeText(home.heroTitle, fallbackHomeContent.heroTitle));
+  setText('[data-home="heroHighlight"]', safeText(home.heroHighlight, fallbackHomeContent.heroHighlight));
+  setText('[data-home="heroDescription"]', safeText(home.heroDescription, fallbackHomeContent.heroDescription));
+  setText('[data-home="profileName"]', safeText(home.profileName, fallbackHomeContent.profileName));
+  setText('[data-home="profileRole"]', safeText(home.profileRole, fallbackHomeContent.profileRole));
+
+  const primaryUrl = safeUrl(home.primaryButtonUrl, fallbackHomeContent.primaryButtonUrl);
+  const profileButtonUrl = safeUrl(home.profileButtonUrl, home.primaryButtonUrl || fallbackHomeContent.profileButtonUrl);
+
+  setLink('[data-home="primaryButton"]', safeText(home.primaryButtonText, fallbackHomeContent.primaryButtonText), primaryUrl);
+  setLink('[data-home="profileButton"]', safeText(home.profileButtonText, fallbackHomeContent.profileButtonText), profileButtonUrl);
+  setText('[data-home="secondaryButton"]', safeText(home.secondaryButtonText, fallbackHomeContent.secondaryButtonText));
+
+  const profileImage = document.querySelector('[data-home="profileImage"]');
+  if (profileImage) {
+    profileImage.src = safeUrl(home.profileImageUrl, fallbackHomeContent.profileImageUrl);
+    profileImage.alt = `Foto de perfil de ${safeText(home.profileName, 'Gaby')}`;
+  }
+}
+
+async function loadHomeContent() {
+  applyHomeContent(fallbackHomeContent);
+
+  if (!isFirebaseConfigured) return;
+
+  try {
+    const snapshot = await getDoc(doc(db, 'siteContent', 'home'));
+
+    if (snapshot.exists()) {
+      applyHomeContent(snapshot.data());
+    }
+  } catch (error) {
+    console.error('Could not load home content. Using fallback home content.', error);
+  }
 }
 
 function normalizeAsset(asset) {
@@ -214,6 +305,17 @@ function renderAssets() {
   });
 }
 
+function preloadCarouselImages(images = []) {
+  images.forEach((src) => {
+    if (!src || carouselImageCache.has(src)) return;
+
+    const preloadedImage = new Image();
+    preloadedImage.decoding = 'async';
+    preloadedImage.src = src;
+    carouselImageCache.set(src, preloadedImage);
+  });
+}
+
 function updateCarouselImage(carousel, newIndex) {
   const image = carousel.querySelector('img');
   const dots = carousel.querySelectorAll('.carousel-dot');
@@ -231,19 +333,6 @@ function updateCarouselImage(carousel, newIndex) {
   });
 }
 
-const carouselImageCache = new Map();
-
-function preloadCarouselImages(images = []) {
-  images.forEach((src) => {
-    if (!src || carouselImageCache.has(src)) return;
-
-    const preloadedImage = new Image();
-    preloadedImage.decoding = 'async';
-    preloadedImage.src = src;
-    carouselImageCache.set(src, preloadedImage);
-  });
-}
-
 function setupAssetCarousels(root = document) {
   root.querySelectorAll('.asset-carousel').forEach((carousel) => {
     const image = carousel.querySelector('img');
@@ -252,7 +341,6 @@ function setupAssetCarousels(root = document) {
     if (images.length <= 1 || carousel.dataset.carouselReady === 'true') return;
 
     carousel.dataset.carouselReady = 'true';
-    
     preloadCarouselImages(images);
 
     const prevButton = carousel.querySelector('.carousel-btn-prev');
@@ -277,11 +365,6 @@ function setupAssetCarousels(root = document) {
         updateCarouselImage(carousel, Number(dot.dataset.dot));
       });
     });
-
-    // setInterval(() => {
-    //   const currentIndex = Number(carousel.dataset.currentImage);
-    //   updateCarouselImage(carousel, currentIndex + 1);
-    // }, 3500);
   });
 }
 
@@ -350,4 +433,5 @@ function setupParticles() {
 setupNavigation();
 setupTheme();
 setupParticles();
+loadHomeContent();
 loadAssets();

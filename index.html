@@ -17,7 +17,7 @@
         <header class="navbar">
             <a href="#home" class="brand" data-section-link="home" aria-label="Ir para Home">
                 <span class="brand-icon">♡</span>
-                <span>Kawaii Assets</span>
+                <span data-home="brandName">Kawaii Assets</span>
             </a>
 
             <nav class="nav-links" aria-label="Navegação principal">
@@ -34,24 +34,24 @@
         <section class="section-shell active" id="home" data-section="home">
             <div class="hero-grid">
                 <div class="hero-copy">
-                    <span class="eyebrow">✿ Roblox • Blender • Kawaii Assets</span>
-                    <h1>Game-ready assets crafted to enhance your experiences <span class="gradient-text">with creativity</span></h1>
-                    <p class="hero-description">
+                    <span class="eyebrow" data-home="heroEyebrow">✿ Roblox • Blender • Kawaii Assets</span>
+                    <h1><span data-home="heroTitle">Game-ready assets crafted to enhance your experiences</span> <span class="gradient-text" data-home="heroHighlight">with creativity</span></h1>
+                    <p class="hero-description" data-home="heroDescription">
                         Portfolio focused on creating Roblox assets using Blender, including hair, plushies, accessories, and custom items with a clean and polished style.
                     </p>
 
                     <div class="hero-actions">
-                        <a class="btn btn-primary" href="https://discordapp.com/users/779361077308817429" target="_blank" rel="noreferrer">
+                        <a class="btn btn-primary" href="https://discordapp.com/users/779361077308817429" target="_blank" rel="noreferrer" data-home="primaryButton">
                             ♡ dm me
                         </a>
-                        <a class="btn btn-soft" href="#hairs" data-section-link="hairs">View Assets</a>
+                        <a class="btn btn-soft" href="#hairs" data-section-link="hairs" data-home="secondaryButton">View Assets</a>
                     </div>
                 </div>
 
                 <aside class="profile-card" aria-label="Card de perfil">
                     <div class="profile-image-wrap">
                         <img src="images/profile.png"
-                            alt="Foto de perfil" />
+                            alt="Foto de perfil" data-home="profileImage" />
                         <!--<div class="profile-placeholder">
                             Troque essa imagem pela sua foto em:<br />
                             <small>&lt;img src="sua-foto.png"&gt;</small>
@@ -60,10 +60,10 @@
 
                     <div class="profile-footer">
                         <div>
-                            <strong>♡ Gaby </strong>
-                            <span>3D Roblox Asset Creator</span>
+                            <strong data-home="profileName">♡ Gaby</strong>
+                            <span data-home="profileRole">3D Roblox Asset Creator</span>
                         </div>
-                        <a class="btn btn-primary" href="https://discordapp.com/users/779361077308817429" target="_blank" rel="noreferrer">♡ dm me</a>
+                        <a class="btn btn-primary" href="https://discordapp.com/users/779361077308817429" target="_blank" rel="noreferrer" data-home="profileButton">♡ dm me</a>
                     </div>
                 </aside>
             </div>
