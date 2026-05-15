@@ -173,3 +173,36 @@ service firebase.storage {
 - If `siteContent/home` does not exist yet, the public site uses the original local Home texts and image.
 - The Home profile image is uploaded to `site/home/{uid}/...`.
 - Asset images are uploaded to `assets/{uid}/...`.
+
+
+## Theme editable pelo painel admin
+
+Agora o painel também salva as cores do tema em:
+
+```txt
+siteContent/theme
+```
+
+Garanta que suas regras do Firestore permitam leitura pública e escrita apenas para usuários logados:
+
+```js
+match /siteContent/{documentId} {
+  allow read: if true;
+  allow create, update: if request.auth != null && documentId in ['home', 'theme'];
+  allow delete: if false;
+}
+```
+
+
+## Atualização do tema claro/escuro
+
+O documento `siteContent/theme` agora salva duas paletas separadas:
+
+```js
+{
+  light: { bg, bgSoft, text, muted, primary, primaryStrong, secondary, accent },
+  dark: { bg, bgSoft, text, muted, primary, primaryStrong, secondary, accent }
+}
+```
+
+As mesmas regras para `siteContent/theme` continuam válidas: leitura pública e escrita apenas para usuários autenticados.

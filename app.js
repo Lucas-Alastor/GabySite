@@ -22,6 +22,31 @@ const fallbackHomeContent = {
   profileImageUrl: 'images/profile.png'
 };
 
+
+const fallbackThemeContent = {
+  light: {
+    bg: '#fff7fb',
+    bgSoft: '#ffeaf4',
+    text: '#5b3146',
+    muted: '#9b6d82',
+    primary: '#ff7eb6',
+    primaryStrong: '#ff4f9a',
+    secondary: '#ffc2dc',
+    accent: '#b98cff'
+  },
+  dark: {
+    bg: '#17111f',
+    bgSoft: '#24182f',
+    text: '#ffeaf5',
+    muted: '#d5a9c1',
+    primary: '#ff8ec8',
+    primaryStrong: '#ff66b5',
+    secondary: '#3b274c',
+    accent: '#c7a2ff'
+  }
+};
+
+
 const fallbackAssetData = {
   hairs: [
     ['Soft Brown Straight Hair', 'Long brown hair with soft bangs and a smooth, polished finish.', 'Hair', 'Kawaii', 'images/hair.png'],
@@ -69,6 +94,7 @@ const sections = document.querySelectorAll('[data-section]');
 const themeToggle = document.getElementById('themeToggle');
 const rainLayer = document.getElementById('rainLayer');
 const carouselImageCache = new Map();
+let currentThemeContent = normalizeThemeContent(fallbackThemeContent);
 
 function createEmptyAssetData() {
   return {
@@ -117,6 +143,91 @@ function setLink(selector, text, url) {
   if (!element) return;
   element.textContent = text;
   element.href = url;
+}
+
+
+function getReadableHexColor(value, fallback) {
+  const color = String(value || '').trim();
+  return /^#[0-9a-fA-F]{6}$/.test(color) ? color : fallback;
+}
+
+function normalizeThemePalette(palette = {}, fallbackPalette = fallbackThemeContent.light) {
+  return {
+    bg: getReadableHexColor(palette.bg, fallbackPalette.bg),
+    bgSoft: getReadableHexColor(palette.bgSoft, fallbackPalette.bgSoft),
+    text: getReadableHexColor(palette.text, fallbackPalette.text),
+    muted: getReadableHexColor(palette.muted, fallbackPalette.muted),
+    primary: getReadableHexColor(palette.primary, fallbackPalette.primary),
+    primaryStrong: getReadableHexColor(palette.primaryStrong, fallbackPalette.primaryStrong),
+    secondary: getReadableHexColor(palette.secondary, fallbackPalette.secondary),
+    accent: getReadableHexColor(palette.accent, fallbackPalette.accent)
+  };
+}
+
+function isLegacyFlatTheme(theme = {}) {
+  return Boolean(theme.bg || theme.bgSoft || theme.text || theme.primary || theme.accent);
+}
+
+function normalizeThemeContent(theme = {}) {
+  if (isLegacyFlatTheme(theme)) {
+    return {
+      light: normalizeThemePalette(theme, fallbackThemeContent.light),
+      dark: normalizeThemePalette(theme.dark || {}, fallbackThemeContent.dark)
+    };
+  }
+
+  return {
+    light: normalizeThemePalette(theme.light || {}, fallbackThemeContent.light),
+    dark: normalizeThemePalette(theme.dark || {}, fallbackThemeContent.dark)
+  };
+}
+
+function getActiveSiteThemeMode() {
+  return document.body.classList.contains('dark') ? 'dark' : 'light';
+}
+
+function buildRgbaFromHex(hex, alpha) {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function applyThemeContent(theme = currentThemeContent) {
+  currentThemeContent = normalizeThemeContent(theme);
+  const safeTheme = currentThemeContent[getActiveSiteThemeMode()];
+
+  const root = document.documentElement;
+  const targets = [root, document.body].filter(Boolean);
+  targets.forEach((target) => {
+    target.style.setProperty('--bg', safeTheme.bg);
+    target.style.setProperty('--bg-soft', safeTheme.bgSoft);
+    target.style.setProperty('--text', safeTheme.text);
+    target.style.setProperty('--muted', safeTheme.muted);
+    target.style.setProperty('--primary', safeTheme.primary);
+    target.style.setProperty('--primary-strong', safeTheme.primaryStrong);
+    target.style.setProperty('--secondary', safeTheme.secondary);
+    target.style.setProperty('--accent', safeTheme.accent);
+    target.style.setProperty('--border', buildRgbaFromHex(safeTheme.primary, 0.28));
+    target.style.setProperty('--particle', buildRgbaFromHex(safeTheme.primary, 0.5));
+    target.style.setProperty('--particle-2', buildRgbaFromHex(safeTheme.accent, 0.42));
+  });
+}
+
+async function loadThemeContent() {
+  applyThemeContent(fallbackThemeContent);
+
+  if (!isFirebaseConfigured) return;
+
+  try {
+    const snapshot = await getDoc(doc(db, 'siteContent', 'theme'));
+    if (snapshot.exists()) {
+      applyThemeContent(snapshot.data());
+    }
+  } catch (error) {
+    console.error('Could not load theme content. Using fallback theme.', error);
+  }
 }
 
 function applyHomeContent(content = {}) {
@@ -405,11 +516,14 @@ function setupTheme() {
     themeToggle.textContent = '☀';
   }
 
+  applyThemeContent(currentThemeContent);
+
   themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark');
     const isDark = document.body.classList.contains('dark');
     themeToggle.textContent = isDark ? '☀' : '☾';
     localStorage.setItem('kawaii-theme', isDark ? 'dark' : 'light');
+    applyThemeContent(currentThemeContent);
   });
 }
 
@@ -433,5 +547,6 @@ function setupParticles() {
 setupNavigation();
 setupTheme();
 setupParticles();
+loadThemeContent();
 loadHomeContent();
 loadAssets();
